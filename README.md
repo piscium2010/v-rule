@@ -15,7 +15,7 @@ Light and flexible validatin rules for form
 
 ## Example
 
-**basic**
+**Basic**
 
 ```jsx
 const validation = v.create({
@@ -33,7 +33,7 @@ result = validation.test({ name: '', pwd: '2', confirm: '3' })
 // => r { pass: false, messages: { name: 'required', pwd: '', confirm: 'should match pwd' } }
 ```
 
-**compound**
+**Compound**
 
 ```js
 const validation = v.create({
@@ -44,7 +44,7 @@ const result = validation.test({ age: 'seven' })
 // => { pass: false, messages: { age: 'should be number' } }
 ```
 
-**multi rules**
+**Multi rules**
 
 ```js
 const validation = v.create({
@@ -64,7 +64,7 @@ const result = validation.test({ age: '17', min: 18, max: 50 })
 // => r { pass: false, messages: { age: 'should between min and max' } }
 ```
 
-**trigger another validation**
+**Trigger another rule**
 
 ```js
 const validation = v.create({
@@ -77,7 +77,7 @@ const result = validation.test({ beer: 1 }, context)
 // => { pass: false, messages: { age: 'age should be greater than 18' } }
 ```
 
-**validate one**
+**Test one**
 
 ```js
 const validation = v.create({
@@ -100,7 +100,7 @@ const result = validation.test({ MARRIAGE_DATE: '' }, context)
 // => { pass: false, messages: { MARRIAGE_DATE: 'required when married' } }
 ```
 
-**validate all**
+**Test all**
 
 ```js
 const validation = v.create({
