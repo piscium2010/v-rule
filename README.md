@@ -1,4 +1,4 @@
-# v-rules
+# v-rule
 Light and flexible validatin rules for form
 
 
@@ -13,11 +13,18 @@ Light and flexible validatin rules for form
 -   expect(desc: string, assert? context => bool)
 -   validate(key: string)
 
+## Install
+
+```js
+npm i -S v-rule
+```
+
 ## Example
 
 **Basic**
 
 ```jsx
+import v from 'v-rule'
 const validation = v.create({
         name: v.expect('required'),
         pwd: v.expect('required'),
