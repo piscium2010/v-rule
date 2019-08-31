@@ -4,7 +4,7 @@ Light and flexible validatin rules for form
 
 ## Advantages:
 
--   Dead simple API, learned in 1 minutes. u will feel like u are so smart
+-   Dead simple API, learned in 5 minutes.
 -   Quite flexible
 -   Small library with no dependence
 
