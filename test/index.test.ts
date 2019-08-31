@@ -59,52 +59,63 @@ test('trigger another validation', () => {
 
 test('validate one', () => {
     const validation = v.create({
-        DATE_OF_BIRTH: v.expect('required').expect('is Date', c => v.isDate(c.DATE_OF_BIRTH)),
-        MARRIAGE: v.expect('should be one of single/married', c => ['single', 'married'].includes(c.MARRIAGE)),
-        DATE_OF_MARRIAGE: [
+        BIRTH_DATE: v.expect('required'),
+        MARRIAGE:
+            v.expect(
+                'one of single/married',
+                c => ['single', 'married'].includes(c.MARRIAGE)
+            ),
+        MARRIAGE_DATE: [
             v.when('MARRIAGE', c => c.MARRIAGE === 'married').
                 expect('required when married'),
-            v.when('DATE_OF_BIRTH').
-                expect('should greater than date of birth', c => c.DATE_OF_MARRIAGE > c.DATE_OF_BIRTH),
+            v.when('BIRTH_DATE').
+                expect('should greater than date of birth', c => c.MARRIAGE_DATE > c.BIRTH_DATE),
         ]
     })
-    const context = { DATE_OF_BIRTH: '2000-1-1', MARRIAGE: 'married' }
-    const result = validation.test({ DATE_OF_MARRIAGE: '' }, context)
+    const context = { BIRTH_DATE: '2000-1-1', MARRIAGE: 'married' }
+    const result = validation.test({ MARRIAGE_DATE: '' }, context)
     // console.log(`r`,result)
-    // => { pass: false, messages: { DATE_OF_MARRIAGE: 'required when married' } }
+    // => { pass: false, messages: { MARRIAGE_DATE: 'required when married' } }
     expect(result.pass).toEqual(false)
-    expect(result.messages.DATE_OF_MARRIAGE).toEqual('required when married')
+    expect(result.messages.MARRIAGE_DATE).toEqual('required when married')
 })
 
 test('validate all', () => {
     const validation = v.create({
-        DATE_OF_BIRTH: v.expect('required').expect('is Date', c => v.isDate(c.DATE_OF_BIRTH)),
-        MARRIAGE: v.expect('should be one of single/married', c => ['single', 'married'].includes(c.MARRIAGE)),
-        DATE_OF_MARRIAGE: [
+        BIRTH_DATE: v.expect('required'),
+        MARRIAGE:
+            v.expect(
+                'should be one of single/married',
+                c => ['single', 'married'].includes(c.MARRIAGE)
+            ),
+        MARRIAGE_DATE: [
             v.when('MARRIAGE', c => c.MARRIAGE === 'married').
                 expect('required when married'),
-            v.when('DATE_OF_BIRTH').
-                expect('should greater than date of birth', c => c.DATE_OF_MARRIAGE > c.DATE_OF_BIRTH),
+            v.when('BIRTH_DATE').
+                expect(
+                    'should greater than date of birth',
+                    c => c.MARRIAGE_DATE > c.BIRTH_DATE
+                ),
         ]
     })
     const result = validation.test({
-        DATE_OF_BIRTH: '2000-1-1',
+        BIRTH_DATE: '2000-1-1',
         MARRIAGE: 'married',
-        DATE_OF_MARRIAGE: '1999-1-1'
+        MARRIAGE_DATE: '1999-1-1'
     })
     // => { 
     //      pass: false,
     //      messages: 
     //      { 
-    //        DATE_OF_BIRTH: '',
+    //        BIRTH_DATE: '',
     //        MARRIAGE: '',
-    //        DATE_OF_MARRIAGE: 'should greater than date of birth' 
+    //        MARRIAGE_DATE: 'should greater than date of birth' 
     //      } 
     //    }
     expect(result.pass).toEqual(false)
-    expect(result.messages.DATE_OF_BIRTH).toEqual('')
+    expect(result.messages.BIRTH_DATE).toEqual('')
     expect(result.messages.MARRIAGE).toEqual('')
-    expect(result.messages.DATE_OF_MARRIAGE).toEqual('should greater than date of birth')
+    expect(result.messages.MARRIAGE_DATE).toEqual('should greater than date of birth')
 })
 
 
