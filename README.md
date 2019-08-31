@@ -1,5 +1,5 @@
 # v-rules
-Form validation rules
+Light and flexible validatin rules for form
 
 
 ## Advantages:

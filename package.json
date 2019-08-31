@@ -1,7 +1,7 @@
 {
   "name": "v-rule",
   "version": "1.0.0",
-  "description": "",
+  "description": "Light and flexible validatin rules for form",
   "main": "index.js",
   "scripts": {
     "build": "tsc",
@@ -10,9 +10,10 @@
   "keywords": [
     "form",
     "validation",
-    "yup"
+    "yup",
+    "rule"
   ],
-  "author": "",
+  "author": "piscium2010 <541032442@qq.com>",
   "license": "ISC",
   "devDependencies": {
     "@types/jest": "^24.0.18",
