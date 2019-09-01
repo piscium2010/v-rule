@@ -80,46 +80,6 @@ test('validate one', () => {
     expect(result.messages.MARRIAGE_DATE).toEqual('required when married')
 })
 
-test('validate all', () => {
-    const validation = v.create({
-        BIRTH_DATE: v.expect('required'),
-        MARRIAGE:
-            v.expect(
-                'should be one of single/married',
-                c => ['single', 'married'].includes(c.MARRIAGE)
-            ),
-        MARRIAGE_DATE: [
-            v.when('MARRIAGE', c => c.MARRIAGE === 'married').
-                expect('required when married'),
-            v.when('BIRTH_DATE').
-                expect(
-                    'should greater than date of birth',
-                    c => c.MARRIAGE_DATE > c.BIRTH_DATE
-                ),
-        ]
-    })
-    const result = validation.test({
-        BIRTH_DATE: '2000-1-1',
-        MARRIAGE: 'married',
-        MARRIAGE_DATE: '1999-1-1'
-    })
-    // => { 
-    //      pass: false,
-    //      messages: 
-    //      { 
-    //        BIRTH_DATE: '',
-    //        MARRIAGE: '',
-    //        MARRIAGE_DATE: 'should greater than date of birth' 
-    //      } 
-    //    }
-    expect(result.pass).toEqual(false)
-    expect(result.messages.BIRTH_DATE).toEqual('')
-    expect(result.messages.MARRIAGE).toEqual('')
-    expect(result.messages.MARRIAGE_DATE).toEqual('should greater than date of birth')
-})
-
-
-
 test('invalid rule: 0', () => {
     try {
         const ruleStore = {
@@ -263,9 +223,6 @@ test('prevent infinite validate loop', () => {
     expect(r.messages.whisky).toEqual(wMessage)
 })
 
-// v.isBool
-// v.oneOf
-// v.expect(`${0} is requried`)
 test('Form I', () => {
     const validation = v.create({
         NAME: v.expect('required'),
@@ -318,4 +275,17 @@ test('Form I', () => {
     r = validation.test({ DATE_OF_MARRIAGE: new Date('1999-1-1') }, { MARRIAGE: 'married', DATE_OF_BIRTH: new Date('2000-1-1') })
     expect(r.pass).toEqual(false)
     expect(r.messages.DATE_OF_MARRIAGE).toEqual('greater than date of birth')
+})
+
+test('testAllRules', () => {
+    const validation = v.create({
+        name: v.expect('required'),
+        pwd: v.expect('required')
+    })
+    let r
+    r = validation.testAllRules({ name: 'a' })
+    // => { pass: false, messages: { name: '', pwd: 'required' } }
+    expect(r.pass).toEqual(false)
+    expect(r.messages.name).toEqual('')
+    expect(r.messages.pwd).toEqual('required')
 })

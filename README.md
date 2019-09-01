@@ -84,64 +84,17 @@ const result = validation.test({ beer: 1 }, context)
 // => { pass: false, messages: { age: 'age should be greater than 18' } }
 ```
 
-**Test one**
+**Test all rules**
+
+v.test only tests with available keys in obj whereas testAllRules will test all keys against all rules. Keys not provided will default to {key: undefined}. Use v.testAllRules when submit form.
 
 ```js
 const validation = v.create({
-    BIRTH_DATE: v.expect('required'),
-    MARRIAGE:
-        v.expect(
-            'one of single/married',
-            c => ['single', 'married'].includes(c.MARRIAGE)
-        ),
-    MARRIAGE_DATE: [
-        v.when('MARRIAGE', c => c.MARRIAGE === 'married').
-            expect('required when married'),
-        v.when('BIRTH_DATE').
-            expect('should greater than date of birth', c => c.MARRIAGE_DATE > c.BIRTH_DATE),
-    ]
+    name: v.expect('required'),
+    pwd: v.expect('required')
 })
-
-const context = { BIRTH_DATE: '2000-1-1', MARRIAGE: 'married' }
-const result = validation.test({ MARRIAGE_DATE: '' }, context)
-// => { pass: false, messages: { MARRIAGE_DATE: 'required when married' } }
-```
-
-**Test all**
-
-```js
-const validation = v.create({
-    BIRTH_DATE: v.expect('required'),
-    MARRIAGE:
-        v.expect(
-            'should be one of single/married',
-            c => ['single', 'married'].includes(c.MARRIAGE)
-        ),
-    MARRIAGE_DATE: [
-        v.when('MARRIAGE', c => c.MARRIAGE === 'married').
-            expect('required when married'),
-        v.when('BIRTH_DATE').
-            expect(
-                'should greater than date of birth',
-                c => c.MARRIAGE_DATE > c.BIRTH_DATE
-            ),
-    ]
-})
-
-const result = validation.test({
-    BIRTH_DATE: '2000-1-1',
-    MARRIAGE: 'married',
-    MARRIAGE_DATE: '1999-1-1'
-})
-// => { 
-//      pass: false,
-//      messages: 
-//      { 
-//        BIRTH_DATE: '',
-//        MARRIAGE: '',
-//        MARRIAGE_DATE: 'should greater than date of birth' 
-//      } 
-//    }
+let r = validation.testAllRules({ name: 'a' })
+// => { pass: false, messages: { name: '', pwd: 'required' } }
 ```
 
 **utils**

@@ -74,7 +74,7 @@ class Validation {
     context: Context
     ruleStore: RuleStore
     validatedKeys: Array<string>
-    
+
     constructor(ruleStore) {
         this.ruleStore = ruleStore
         this.validatedKeys = []
@@ -116,6 +116,11 @@ class Validation {
             mergeResult(result, oneResult)
         }
         return result as ValidationResult
+    }
+
+    testAllRules(obj, context?) {
+        const defaultObj = Object.keys(this.ruleStore).reduce((prev, key) => Object.assign(prev, { [key]: undefined }), {})
+        return this.test(Object.assign({}, defaultObj, obj), context)
     }
 }
 
