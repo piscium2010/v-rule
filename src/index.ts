@@ -1,4 +1,4 @@
-import { isTruthy, isInteger, isNumber, isDate } from './util'
+import { isTruthy, isInteger, isNumber, isDate, isEmail, isUrl } from './util'
 const noPrerequisite = () => ({ pass: true })
 const emptyKeys = []
 
@@ -127,7 +127,9 @@ const v = {
     isTruthy,
     isInteger,
     isNumber,
-    isDate
+    isDate,
+    isEmail,
+    isUrl
 }
 
 export default v
