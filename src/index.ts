@@ -14,7 +14,7 @@ export const ERROR_0 = `every rule should end with either expect(desc: string, a
 export const ERROR_1 = `non-empty string is required for when(key: string).`
 export const ERROR_2 = `non-empty string is required for expect(desc: string, assert?: func => bool).`
 
-function when(prerequisite, relativeKeys, key, assert) {
+function when(prerequisite, relativeKeys, key, assert?) {
     if (typeof key !== 'string' || key === '') { throw ERROR_1 }
     const rule = (instance, primaryKey) => {
         if (prerequisite(instance, primaryKey).pass) {
@@ -34,7 +34,7 @@ function when(prerequisite, relativeKeys, key, assert) {
     }
 }
 
-function expect(prerequisite, relativeKeys, desc, assert) {
+function expect(prerequisite, relativeKeys, desc, assert?) {
     if (typeof desc !== 'string' || desc === '') { throw ERROR_2 }
     let rule
     rule = function (instance, primaryKey) {
