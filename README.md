@@ -86,7 +86,7 @@ const result = validation.test({ beer: 1 }, context)
 
 **Test all rules**
 
-v.test only tests with available keys in obj whereas testAllRules will test all keys against all rules. Keys not provided will default to {key: undefined}. Use v.testAllRules when submit form.
+v.test only tests with available values in obj whereas testAllRules will default unavailable value to {key: undefined} and test against all rules. Use v.testAllRules when submit form.
 
 ```js
 const validation = v.create({
