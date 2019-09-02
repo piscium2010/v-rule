@@ -141,7 +141,7 @@ export default v
 
 function mergeResult(origin, addition: any = {}) {
     if ('pass' in addition) {
-        origin.pass = addition.pass
+        origin.pass = origin.pass === false ? origin.pass : addition.pass // do not overwrite false result
     }
     if ('messages' in addition) {
         origin.messages = Object.assign(origin.messages || {}, addition.messages)

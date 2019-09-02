@@ -279,13 +279,12 @@ test('Form I', () => {
 
 test('testAllRules', () => {
     const validation = v.create({
-        name: v.expect('required'),
-        pwd: v.expect('required')
+        email: v.expect('required'),
+        marriage: v.expect('required').expect('should be single or married', c => ['single', 'married'].includes(c.marriage)),
+        marriage_date: v.when('marriage', c => c.marriage === 'married').expect('required')
     })
-    let r
-    r = validation.testAllRules({ name: 'a' })
-    // => { pass: false, messages: { name: '', pwd: 'required' } }
+    let r = validation.testAllRules({})
     expect(r.pass).toEqual(false)
-    expect(r.messages.name).toEqual('')
-    expect(r.messages.pwd).toEqual('required')
+    expect(r.messages.email).toEqual('required')
+    expect(r.messages.marriage).toEqual('required')
 })
