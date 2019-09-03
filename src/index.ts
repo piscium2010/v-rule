@@ -51,7 +51,7 @@ function expect(prerequisite, relativeKeys, desc, assert?) {
 
         return result.pass === false && result.messages
             ? result // result from previous expect
-            : { pass: true } // validation not triggered, default to true without messages
+            : { pass: true, messages: { [primaryKey]: '' } } // validation not triggered, default to true with empty messages
     }
 
     rule.expect = expect.bind(null, rule, relativeKeys)
