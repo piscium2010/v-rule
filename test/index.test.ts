@@ -288,3 +288,18 @@ test('testAllRules', () => {
     expect(r.messages.email).toEqual('required')
     expect(r.messages.marriage).toEqual('required')
 })
+
+test('default to true with empty messages when validation not triggered', () => {
+    const validation = v.create({
+        email: v.expect('email is required').expect('Should be email', c => v.isEmail(c.email)),
+        marriage: [
+            v.expect('marriage is required').expect('Should be single or married', c => ['single', 'married'].includes(c.marriage)),
+            v.when('marriage', c => c.marriage === 'single').validate('marriage_date')
+        ],
+        marriage_date: v.when('marriage', c => c.marriage === 'married').expect('Required when married')
+    })
+    let r = validation.test({ marriage: 'single' }, { marriage_date: undefined })
+    expect(r.pass).toEqual(true)
+    expect(r.messages.marriage).toEqual('')
+    expect(r.messages.marriage_date).toEqual('')
+})
