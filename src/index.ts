@@ -107,7 +107,7 @@ class Validation {
         return result
     }
 
-    test(obj, context?) {
+    test = (obj, context?) => {
         const result = {}
         this.validatedKeys = []
         this.context = Object.assign({}, context, obj)
@@ -118,7 +118,7 @@ class Validation {
         return result as ValidationResult
     }
 
-    testAllRules(obj, context?) {
+    testAllRules = (obj, context?) => {
         const defaultObj = Object.keys(this.ruleStore).reduce((prev, key) => Object.assign(prev, { [key]: undefined }), {})
         return this.test(Object.assign({}, defaultObj, obj), context)
     }
