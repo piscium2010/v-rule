@@ -88,7 +88,7 @@ test('invalid rule: 0', () => {
         const validation = v.create(ruleStore)
         let r = validation.test({ name: '' })
     } catch (e) {
-        expect(e).toEqual(ERROR_0)
+        expect(e.message).toEqual(ERROR_0)
     }
 })
 
@@ -100,7 +100,7 @@ test('invalid rule: 1', () => {
         const validation = v.create(ruleStore)
         validation.test({ name: '' })
     } catch (e) {
-        expect(e).toEqual(ERROR_1)
+        expect(e.message).toEqual(ERROR_1)
     }
 })
 
@@ -112,7 +112,7 @@ test('invalid rule: 2', () => {
         const validation = v.create(ruleStore)
         validation.test({ name: '' })
     } catch (e) {
-        expect(e).toEqual(ERROR_2)
+        expect(e.message).toEqual(ERROR_2)
     }
 })
 
@@ -302,4 +302,46 @@ test('default to true with empty messages when validation not triggered', () => 
     expect(r.pass).toEqual(true)
     expect(r.messages.marriage).toEqual('')
     expect(r.messages.marriage_date).toEqual('')
+})
+
+test('whenNot', () => {
+    const validation = v.create({
+        cell: v.whenNot('email').expect('required')
+    })
+    let r = validation.test({cell: ''})
+    expect(r.pass).toEqual(false)
+    expect(r.messages.cell).toEqual('required')
+})
+
+test('whenNot > whenNot', () => {
+    const validation = v.create({
+        phone: v.whenNot('email').whenNot('cell').expect('required')
+    })
+    let r
+    r = validation.test({phone: ''})
+    expect(r.pass).toEqual(false)
+    expect(r.messages.phone).toEqual('required')
+
+    r = validation.test({cell: '1', phone: ''})
+    expect(r.pass).toEqual(true)
+    expect(r.messages.phone).toEqual('')
+
+    r = validation.test({ phone: ''},{cell:'1'}/* context */)
+    expect(r.pass).toEqual(true)
+    expect(r.messages.phone).toEqual('')
+})
+
+test('whenNot > when', () => {
+    const validation = v.create({
+        phone: v.whenNot('email').when('cell').expect('empty', c => c['phone'] === '')
+    })
+
+    let r
+    r = validation.test({cell:'1', phone: '1'})
+    expect(r.pass).toEqual(false)
+    expect(r.messages.phone).toEqual('empty')
+
+    r = validation.test({cell: '1', phone: ''})
+    expect(r.pass).toEqual(true)
+    expect(r.messages.phone).toEqual('')
 })

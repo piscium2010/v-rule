@@ -15,7 +15,7 @@ export const ERROR_1 = `non-empty string is required for when(key: string).`
 export const ERROR_2 = `non-empty string is required for expect(desc: string, assert?: func => bool).`
 
 function when(prerequisite, relativeKeys, key, assert?) {
-    if (typeof key !== 'string' || key === '') { throw ERROR_1 }
+    if (typeof key !== 'string' || key === '') { throw new Error(ERROR_1) }
     const rule = (instance, primaryKey) => {
         if (prerequisite(instance, primaryKey).pass) {
             const context = instance.context
@@ -29,13 +29,35 @@ function when(prerequisite, relativeKeys, key, assert?) {
 
     return {
         when: when.bind(null, rule, [key, ...relativeKeys]),
+        whenNot: whenNot.bind(null, rule, [key, ...relativeKeys]),
+        expect: expect.bind(null, rule, [key, ...relativeKeys]),
+        validate: validate.bind(null, rule)
+    }
+}
+
+function whenNot(prerequisite, relativeKeys, key, assert?) {
+    if (typeof key !== 'string' || key === '') { throw new Error(ERROR_1) }
+    const rule = (instance, primaryKey) => {
+        if (prerequisite(instance, primaryKey).pass) {
+            const context = instance.context
+            const obj = { [key]: context[key] }
+            const relativeObj = relativeKeys.reduce((prev, rkey) => Object.assign(prev, { [rkey]: context[rkey] }), {})
+            const values = proxy({ ...obj, ...relativeObj }, primaryKey)
+            return { pass: assert ? assert(values) : !isTruthy(obj[key]) } // NOT
+        }
+        return {}
+    }
+
+    return {
+        whenNot: whenNot.bind(null, rule, [key, ...relativeKeys]),
+        when: when.bind(null, rule, [key, ...relativeKeys]),
         expect: expect.bind(null, rule, [key, ...relativeKeys]),
         validate: validate.bind(null, rule)
     }
 }
 
 function expect(prerequisite, relativeKeys, desc, assert?) {
-    if (typeof desc !== 'string' || desc === '') { throw ERROR_2 }
+    if (typeof desc !== 'string' || desc === '') { throw new Error(ERROR_2) }
     let rule
     rule = function (instance, primaryKey) {
         const result = prerequisite(instance, primaryKey) // {} or {pass: bool} or {pass: bool, messages: object}
@@ -99,7 +121,7 @@ class Validation {
         const instance = this
         const rules: any[] = this.getRules(key)
         for (let rule of rules) {
-            if (typeof rule !== 'function') { throw ERROR_0 }
+            if (typeof rule !== 'function') { throw new Error(ERROR_0) }
             const oneResult = rule(instance, key)
             mergeResult(result, oneResult)
             if (!oneResult.pass) { break }
@@ -128,6 +150,7 @@ const v = {
     create: ruleStore => new Validation(ruleStore),
     expect: expect.bind(null, noPrerequisite, emptyKeys),
     when: when.bind(null, noPrerequisite, emptyKeys),
+    whenNot: whenNot.bind(null, noPrerequisite, emptyKeys), 
     validate: validate.bind(null, noPrerequisite),
     isTruthy,
     isInteger,
