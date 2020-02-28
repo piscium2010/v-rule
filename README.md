@@ -4,13 +4,14 @@ Light and flexible validatin rules for form
 
 ## Advantages:
 
--   Dead simple API, learned in 5 minutes.
--   Quite flexible
+-   Limited API, save you from complicated configuration
+-   Quite flexible, able to compose any validation rule
 -   Small library with no dependence
 
 ## API
--   when(key: string, assert?: context => bool)
--   expect(desc: string, assert? context => bool)
+-   when(key: string)
+-   whenNot(key: string)
+-   expect(desc: string, assert?: func)
 -   validate(key: string)
 
 ## Install
@@ -61,7 +62,7 @@ result = validation.test({ name: '', pwd: '2', confirm: '3' })
 // => r { pass: false, messages: { name: 'required', pwd: '', confirm: 'should match pwd' } }
 ```
 
-**Compound**
+**chain**
 
 ```js
 const validation = v.create({
