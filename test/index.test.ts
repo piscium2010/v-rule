@@ -1,4 +1,5 @@
-import v, { ERROR_0, ERROR_1, ERROR_2 } from '../src/index'
+import { ERROR_0, ERROR_1, ERROR_2 } from '../src/errors'
+import v from '../src'
 
 test('basic', () => {
     const validation = v.create({

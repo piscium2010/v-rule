@@ -1,18 +1,13 @@
-import { isTruthy, isInteger, isNumber, isDate, isEmail, isUrl } from './util'
-const noPrerequisite = () => ({ pass: true })
-const emptyKeys = []
+import { isTruthy, isInteger, isNumber, isDate, isEmail, isUrl, mergeResult } from './util'
+import { ERROR_0, ERROR_1, ERROR_2 } from './errors'
+import Validation from './Validation'
 
 type Assert = (...arg) => boolean
-type Message = { [name: string]: string }
-type RuleStore = { [name: string]: any }
-type Context = { [name: string]: any }
-type ValidationResult = { pass: boolean, messages?: Message }
 type Expect = (desc: string, assert?: Assert) => { expect: Expect }
 type When = (key: string, assert?: Assert) => { when: When, expect: Expect }
 
-export const ERROR_0 = `every rule should end with either expect(desc: string, assert?: func => bool) or validate(key: string).`
-export const ERROR_1 = `non-empty string is required for when(key: string).`
-export const ERROR_2 = `non-empty string is required for expect(desc: string, assert?: func => bool).`
+const noPrerequisite = () => ({ pass: true })
+const emptyKeys = []
 
 function when(prerequisite, relativeKeys, key, assert?) {
     if (typeof key !== 'string' || key === '') { throw new Error(ERROR_1) }
@@ -92,60 +87,6 @@ function validate(prerequisite, key) {
     }
 }
 
-class Validation {
-    context: Context
-    ruleStore: RuleStore
-    validatedKeys: Array<string>
-
-    constructor(ruleStore) {
-        this.ruleStore = ruleStore
-        this.validatedKeys = []
-        this.context = {}
-    }
-
-    getRules = key => this.ruleStore[key] ? [].concat(this.ruleStore[key]) : []
-
-    isKeyValidated = key => {
-        const one = this.validatedKeys.find(n => n === key)
-        if (one) {
-            return true
-        } else {
-            this.validatedKeys.push(key)
-            return false
-        }
-    }
-
-    applyRules = key => {
-        if (this.isKeyValidated(key)) { return {} }
-        const result = {}
-        const instance = this
-        const rules: any[] = this.getRules(key)
-        for (let rule of rules) {
-            if (typeof rule !== 'function') { throw new Error(ERROR_0) }
-            const oneResult = rule(instance, key)
-            mergeResult(result, oneResult)
-            if (!oneResult.pass) { break }
-        }
-        return result
-    }
-
-    test = (obj, context?) => {
-        const result = {}
-        this.validatedKeys = []
-        this.context = Object.assign({}, context, obj)
-        for (let key in obj) {
-            const oneResult = this.applyRules(key)
-            mergeResult(result, oneResult)
-        }
-        return result as ValidationResult
-    }
-
-    testAllRules = (obj, context?) => {
-        const defaultObj = Object.keys(this.ruleStore).reduce((prev, key) => Object.assign(prev, { [key]: undefined }), {})
-        return this.test(Object.assign({}, defaultObj, obj), context)
-    }
-}
-
 const v = {
     create: ruleStore => new Validation(ruleStore),
     expect: expect.bind(null, noPrerequisite, emptyKeys),
@@ -161,15 +102,6 @@ const v = {
 }
 
 export default v
-
-function mergeResult(origin, addition: any = {}) {
-    if ('pass' in addition) {
-        origin.pass = origin.pass === false ? origin.pass : addition.pass // do not overwrite false result
-    }
-    if ('messages' in addition) {
-        origin.messages = Object.assign(origin.messages || {}, addition.messages)
-    }
-}
 
 function proxy(obj, primaryKey) {
     const handler = {
