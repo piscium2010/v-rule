@@ -1,4 +1,4 @@
-import { isTruthy, isInteger, isNumber, isEmail, isUrl } from '../src/util'
+import { hasValue, isInteger, isNumber, isEmail, isUrl } from '../src/util'
 
 let index = 0
 let title = t => t + index++

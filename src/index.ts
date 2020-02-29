@@ -8,9 +8,10 @@ type When = (key: string, assert?: Assert) => { when: When, whenNot: WhenNot, ex
 type WhenNot = (key: string, assert?: Assert) => { when: When, whenNot: WhenNot, expect: Expect }
 
 const noPrerequisite = () => ({ triggered: true, pass: true })
+const noPreset = {}
 const emptyKeys = []
 
-function when(prerequisite, relativeKeys, key, assert?) {
+function when(prerequisite, relativeKeys, preset, key, assert?) {
     if (typeof key !== 'string' || key === '') { throw new Error(ERROR_1) }
     const rule = (instance, primaryKey) => {
         if (prerequisite(instance, primaryKey).triggered) {
@@ -24,41 +25,45 @@ function when(prerequisite, relativeKeys, key, assert?) {
     }
 
     return {
-        when: when.bind(null, rule, [key, ...relativeKeys]),
-        whenNot: whenNot.bind(null, rule, [key, ...relativeKeys]),
-        expect: expect.bind(null, rule, [key, ...relativeKeys]),
+        when: when.bind(null, rule, [key, ...relativeKeys], preset),
+        whenNot: whenNot.bind(null, rule, [key, ...relativeKeys], preset),
+        expect: expect.bind(null, rule, [key, ...relativeKeys], preset),
         validate: validate.bind(null, rule)
     }
 }
 
-function whenNot(prerequisite, relativeKeys, key, assert?) {
-    return when(prerequisite, relativeKeys, key, assert ? assert : values => !hasValue(values[key]))
+function whenNot(prerequisite, relativeKeys, preset, key, assert?) {
+    return when(prerequisite, relativeKeys, preset, key, assert ? assert : values => !hasValue(values[key]))
 }
 
-function expect(prerequisite, relativeKeys, desc, assert?) {
+function expect(prerequisite, relativeKeys, preset, desc, assert?) {
     if (typeof desc !== 'string' || desc === '') { throw new Error(ERROR_2) }
     let rule
     rule = function (instance, primaryKey) {
-        const pre = prerequisite(instance, primaryKey) // {} or {pass: bool} or {pass: bool, messages: object}
+        const pre = prerequisite(instance, primaryKey)
         const next = 'triggered' in pre ? pre['triggered'] : pre.pass
-
         if (next) {
             const context = instance.context
-            const obj = { [primaryKey]: context[primaryKey] }
+            const obj = { [primaryKey]: context[primaryKey], ['$0']: context[primaryKey] }
             const relativeObj = relativeKeys.reduce((prev, rkey) => Object.assign(prev, { [rkey]: context[rkey] }), {})
             const values = proxy({ ...obj, ...relativeObj }, primaryKey)
             const pass = assert ? assert(values) : hasValue(obj[primaryKey])
             const messages = { [primaryKey]: pass ? '' : desc }
-            return { pass, messages }
+            return { pass: pass ? true : false, messages }
         }
 
         return pre.pass === false && pre.messages
-            ? pre // result from previous expect
+            ? pre // result from previous expect or when or whenNot
             : { triggered: false, pass: true, messages: { [primaryKey]: '' } } // validation not triggered
     }
 
-    rule.expect = expect.bind(null, rule, relativeKeys)
-
+    const _expect = expect.bind(null, rule, relativeKeys, preset)
+    const funcs = {}
+    Object.keys(preset).forEach(k => {
+        funcs[k] = preset[k].bind(null, _expect)
+    })
+    rule.expect = _expect
+    Object.assign(rule, { expect: _expect }, funcs)
     return rule
 }
 
@@ -75,28 +80,31 @@ function validate(prerequisite, key) {
     }
 }
 
-// function preset(funcs){
-//     Object.keys(funcs).map(k => {
-//         return funcs[k].bind(null, )
-//     })
-// }
-
-const v = {
-    create: ruleStore => new Validation(ruleStore),
-    expect: expect.bind(null, noPrerequisite, emptyKeys),
-    when: when.bind(null, noPrerequisite, emptyKeys),
-    whenNot: whenNot.bind(null, noPrerequisite, emptyKeys),
-    validate: validate.bind(null, noPrerequisite),
-    isTruthy: hasValue, // deprecated
-    hasValue,
-    isInteger,
-    isNumber,
-    isDate,
-    isEmail,
-    isUrl
+function preset<T>(preset = noPreset) {
+    const _expect = expect.bind(null, noPrerequisite, emptyKeys, preset)
+    const funcs = {}
+    Object.keys(preset).forEach(k => {
+        funcs[k] = preset[k].bind(null, _expect)
+    })
+    return {
+        create: ruleStore => new Validation(ruleStore),
+        expect: _expect,
+        when: when.bind(null, noPrerequisite, emptyKeys, preset),
+        whenNot: whenNot.bind(null, noPrerequisite, emptyKeys, preset),
+        validate: validate.bind(null, noPrerequisite),
+        isTruthy: hasValue, // deprecated
+        hasValue,
+        isInteger,
+        isNumber,
+        isDate,
+        isEmail,
+        isUrl,
+        ...funcs
+    } as any
 }
 
-export default v
+export { preset }
+export default preset()
 
 function proxy(obj, primaryKey) {
     const handler = {
