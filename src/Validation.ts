@@ -36,8 +36,11 @@ export default class Validation {
         const instance = this
         const rules: any[] = this.getRules(key)
         for (let rule of rules) {
-            if (typeof rule !== 'function') { throw new Error(ERROR_0) }
+            if (typeof rule !== 'function') {
+                throw new Error(ERROR_0)
+            }
             const oneResult = rule(instance, key)
+            // console.log(`one `, oneResult)
             mergeResult(result, oneResult)
             if (!oneResult.pass) { break }
         }
