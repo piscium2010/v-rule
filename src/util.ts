@@ -1,4 +1,4 @@
-export const isTruthy = value => value === null || value === undefined || value === '' ? false : true
+export const hasValue = value => value === null || value === undefined || value === '' ? false : true
 export const isNumber = v => /^[0-9]*\.?[0-9]+$/.test(v)
 export const isInteger = v => /^[0-9]+$/.test(v)
 export const isDate = v => {

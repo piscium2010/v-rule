@@ -1,10 +1,11 @@
-import { isTruthy, isInteger, isNumber, isDate, isEmail, isUrl, mergeResult } from './util'
-import { ERROR_0, ERROR_1, ERROR_2 } from './errors'
+import { hasValue, isInteger, isNumber, isDate, isEmail, isUrl, mergeResult } from './util'
+import { ERROR_1, ERROR_2 } from './errors'
 import Validation from './Validation'
 
 type Assert = (...arg) => boolean
 type Expect = (desc: string, assert?: Assert) => { expect: Expect }
-type When = (key: string, assert?: Assert) => { when: When, expect: Expect }
+type When = (key: string, assert?: Assert) => { when: When, whenNot: WhenNot, expect: Expect }
+type WhenNot = (key: string, assert?: Assert) => { when: When, whenNot: WhenNot, expect: Expect }
 
 const noPrerequisite = () => ({ triggered: true, pass: true })
 const emptyKeys = []
@@ -17,9 +18,7 @@ function when(prerequisite, relativeKeys, key, assert?) {
             const obj = { [key]: context[key] }
             const relativeObj = relativeKeys.reduce((prev, rkey) => Object.assign(prev, { [rkey]: context[rkey] }), {})
             const values = proxy({ ...obj, ...relativeObj }, primaryKey)
-            // const is = isTruthy(obj[key])
-            // console.log(`key`, key, is)
-            return { triggered: assert ? assert(values) : isTruthy(obj[key]) }
+            return { triggered: assert ? assert(values) : hasValue(obj[key]) }
         }
         return {}
     }
@@ -33,24 +32,7 @@ function when(prerequisite, relativeKeys, key, assert?) {
 }
 
 function whenNot(prerequisite, relativeKeys, key, assert?) {
-    if (typeof key !== 'string' || key === '') { throw new Error(ERROR_1) }
-    const rule = (instance, primaryKey) => {
-        if (prerequisite(instance, primaryKey).triggered) {
-            const context = instance.context
-            const obj = { [key]: context[key] }
-            const relativeObj = relativeKeys.reduce((prev, rkey) => Object.assign(prev, { [rkey]: context[rkey] }), {})
-            const values = proxy({ ...obj, ...relativeObj }, primaryKey)
-            return { triggered: assert ? assert(values) : !isTruthy(obj[key]) } // NOT
-        }
-        return {}
-    }
-
-    return {
-        whenNot: whenNot.bind(null, rule, [key, ...relativeKeys]),
-        when: when.bind(null, rule, [key, ...relativeKeys]),
-        expect: expect.bind(null, rule, [key, ...relativeKeys]),
-        validate: validate.bind(null, rule)
-    }
+    return when(prerequisite, relativeKeys, key, assert ? assert : values => !hasValue(values[key]))
 }
 
 function expect(prerequisite, relativeKeys, desc, assert?) {
@@ -65,7 +47,7 @@ function expect(prerequisite, relativeKeys, desc, assert?) {
             const obj = { [primaryKey]: context[primaryKey] }
             const relativeObj = relativeKeys.reduce((prev, rkey) => Object.assign(prev, { [rkey]: context[rkey] }), {})
             const values = proxy({ ...obj, ...relativeObj }, primaryKey)
-            const pass = assert ? assert(values) : isTruthy(obj[primaryKey])
+            const pass = assert ? assert(values) : hasValue(obj[primaryKey])
             const messages = { [primaryKey]: pass ? '' : desc }
             return { pass, messages }
         }
@@ -93,13 +75,20 @@ function validate(prerequisite, key) {
     }
 }
 
+// function preset(funcs){
+//     Object.keys(funcs).map(k => {
+//         return funcs[k].bind(null, )
+//     })
+// }
+
 const v = {
     create: ruleStore => new Validation(ruleStore),
     expect: expect.bind(null, noPrerequisite, emptyKeys),
     when: when.bind(null, noPrerequisite, emptyKeys),
     whenNot: whenNot.bind(null, noPrerequisite, emptyKeys),
     validate: validate.bind(null, noPrerequisite),
-    isTruthy,
+    isTruthy: hasValue, // deprecated
+    hasValue,
     isInteger,
     isNumber,
     isDate,
