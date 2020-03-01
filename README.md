@@ -22,26 +22,6 @@ npm i -S v-rule
 
 ## Example
 
-<div align="center">
-<img width="600px" src="https://upload-images.jianshu.io/upload_images/11189734-0118629c411dd98f.gif?imageMogr2/auto-orient/strip"/>
-</div>
-
-```js
-import v from 'v-rule'
-
-const validation = v.create({
-    email: v.expect('Required').expect('Should be email', c => v.isEmail(c.email)),
-    marriage: [
-        v.expect('Required'),
-        v.when('marriage', c => c.marriage === 'single').validate('marriage_date')
-    ],
-    marriage_date: v.when('marriage', c => c.marriage === 'married').expect('Required when married')
-})
-```
-
-## Usage
-
-**Basic**
 <div>
     <img width="600px" src="https://github.com/piscium2010/piscium2010.github.io/raw/master/v-rule/images/a.png">
 </div>
@@ -97,6 +77,10 @@ const validation = v.create({
 const result = validation.test({ seat: '6', drink: 'budweiser', age: 18 })
 // => { pass: trues, messages: {} }
 ```
+
+## Usage
+
+**Basic**
 
 ```jsx
 import v from 'v-rule'
