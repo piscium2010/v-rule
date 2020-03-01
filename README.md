@@ -85,7 +85,7 @@ const validation = v.create({
     seat: v.expect('This is required', c => c['seat'] !== ''),
     age: v.when('drink', c => c['drink'] === 'budweiser')
     .expect('Required when drink beer')
-    .expect('You should be an adult', c => c['age'] > 17)
+    .expect('You should be older than 18', c => c['age'] > 17)
 })
 const result = validation.test({ seat: '6', drink: 'budweiser', age: 18 })
 // => { pass: true, messages: {} }
