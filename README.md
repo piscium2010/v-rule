@@ -20,7 +20,7 @@ Light and flexible validatin rules for form
 npm i -S v-rule
 ```
 
-## Example - Order a beer in restaurant
+## Example - Order beer in restaurant
 
 ### 1
 <div>
@@ -67,10 +67,10 @@ const validation = v.create({
     seat: v.expect('This is required', c => c['seat'] !== ''),
     age: v.when('drink', c => c['drink'] === 'budweiser')
     .expect('Required when drink beer')
-    .expect('You should be an adult', c => c['age'] > 17)
+    .expect('You should be older than 18', c => c['age'] > 17)
 })
 const result = validation.test({ seat: '6', drink: 'budweiser', age: 16 })
-// => { pass: false, messages: { age: 'You should be an adult' } }
+// => { pass: false, messages: { age: 'You should be older than 18' } }
 ```
 
 ### 4
@@ -88,7 +88,7 @@ const validation = v.create({
     .expect('You should be an adult', c => c['age'] > 17)
 })
 const result = validation.test({ seat: '6', drink: 'budweiser', age: 18 })
-// => { pass: trues, messages: {} }
+// => { pass: true, messages: {} }
 ```
 
 ## Usage
@@ -152,18 +152,4 @@ const validation = v.create({
 })
 let r = validation.testAllRules({ name: 'a' })
 // => { pass: false, messages: { name: '', pwd: 'required' } }
-```
-
-**utils**
-
--   v.isTruthy
--   v.isNumber
--   v.isInteger
--   v.isDate
--   v.isEmail
--   v.isUrl
-
-## Tests
-```
-npm test
 ```
