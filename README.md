@@ -24,7 +24,7 @@ npm i -S v-rule
 
 ### 1
 <div>
-    <img width="600px" src="https://github.com/piscium2010/piscium2010.github.io/raw/master/v-rule/images/a.png">
+    <img width="600px" src="https://piscium2010.github.io/v-rule/images/a.png">
 </div>
 
 ```jsx
@@ -40,7 +40,7 @@ const result = validation.test({ seat: '' })
 
 ### 2
 <div>
-    <img width="600px" src="https://github.com/piscium2010/piscium2010.github.io/raw/master/v-rule/images/b.png">
+    <img width="600px" src="https://piscium2010.github.io/v-rule/images/b.png">
 </div>
 
 ```jsx
@@ -57,7 +57,7 @@ const result = validation.test({ seat: '6', drink: 'budweiser', age: '' })
 
 ### 3
 <div>
-    <img width="600px" src="https://github.com/piscium2010/piscium2010.github.io/raw/master/v-rule/images/c.png">
+    <img width="600px" src="https://piscium2010.github.io/v-rule/images/c.png">
 </div>
 
 ```jsx
@@ -75,7 +75,7 @@ const result = validation.test({ seat: '6', drink: 'budweiser', age: 16 })
 
 ### 4
 <div>
-    <img width="600px" src="https://github.com/piscium2010/piscium2010.github.io/raw/master/v-rule/images/d.png">
+    <img width="600px" src="https://piscium2010.github.io/v-rule/images/d.png">
 </div>
 
 ```jsx
