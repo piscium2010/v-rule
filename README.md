@@ -8,9 +8,9 @@ Light and flexible validatin rules for form
 -   Quite flexible, able to compose any validation rule
 -   Small library with no dependence
 
-## API
--   when(key: string)
--   whenNot(key: string)
+## Core API
+-   when(key: string, assert?: func)
+-   whenNot(key: string, assert?: func)
 -   expect(desc: string, assert?: func)
 -   validate(key: string)
 
@@ -31,7 +31,8 @@ npm i -S v-rule
 import v from 'v-rule'
 
 const validation = v.create({
-    seat: v.expect('This is required', c => c['seat'] !== '') // alternative v.expect('This is required')
+    // alternative v.expect('This is required')
+    seat: v.expect('This is required', c => c['seat'] !== '')
 })
 const result = validation.test({ seat: '' })
 // => { pass: false, messages: { seat: 'This is required' } }
@@ -47,7 +48,8 @@ import v from 'v-rule'
 
 const validation = v.create({
     seat: v.expect('This is required', c => c['seat'] !== ''),
-    age: v.when('drink', c => c['drink'] === 'budweiser').expect('Required when drink beer')
+    age: v.when('drink', c => c['drink'] === 'budweiser')
+    .expect('Required when drink beer')
 })
 const result = validation.test({ seat: '6', drink: 'budweiser', age: '' })
 // => { pass: false, messages: { age: 'Required when drink beer' } }
@@ -63,7 +65,9 @@ import v from 'v-rule'
 
 const validation = v.create({
     seat: v.expect('This is required', c => c['seat'] !== ''),
-    age: v.when('drink', c => c['drink'] === 'budweiser').expect('Required when drink beer').expect('You should be an adult', c => c['age'] > 17)
+    age: v.when('drink', c => c['drink'] === 'budweiser')
+    .expect('Required when drink beer')
+    .expect('You should be an adult', c => c['age'] > 17)
 })
 const result = validation.test({ seat: '6', drink: 'budweiser', age: 16 })
 // => { pass: false, messages: { age: 'You should be an adult' } }
@@ -79,7 +83,9 @@ import v from 'v-rule'
 
 const validation = v.create({
     seat: v.expect('This is required', c => c['seat'] !== ''),
-    age: v.when('drink', c => c['drink'] === 'budweiser').expect('Required when drink beer').expect('You should be an adult', c => c['age'] > 17)
+    age: v.when('drink', c => c['drink'] === 'budweiser')
+    .expect('Required when drink beer')
+    .expect('You should be an adult', c => c['age'] > 17)
 })
 const result = validation.test({ seat: '6', drink: 'budweiser', age: 18 })
 // => { pass: trues, messages: {} }
@@ -87,34 +93,19 @@ const result = validation.test({ seat: '6', drink: 'budweiser', age: 18 })
 
 ## Usage
 
-**Basic**
+**Preset**
 
 ```jsx
-import v from 'v-rule'
-const validation = v.create({
-        name: v.expect('required'),
-        pwd: v.expect('required'),
-        confirm: v.when('pwd')
-            .expect('should match pwd', c => c.pwd === c.confirm)
-    })
-let result
+import { preset } from 'v-rule'
 
-result = validation.test({ name: '', pwd: '' })
-// => { pass: false, messages: { name: 'required', pwd: 'required' } }
-
-result = validation.test({ name: '', pwd: '2', confirm: '3' })
-// => r { pass: false, messages: { name: 'required', pwd: '', confirm: 'should match pwd' } }
-```
-
-**chain**
-
-```js
-const validation = v.create({
-    age: v.expect('required').expect('should be number', c => v.isInteger(c.age))
+const v = preset({
+    required: (expect) => expect(`required`),
+    min: (expect, n) => expect(`> ${n}`, c => c['$0'] > n),
+    max: (expect, m) => expect(`> ${m}`, c => c['$0'] < m),
 })
-
-const result = validation.test({ age: 'seven' })
-// => { pass: false, messages: { age: 'should be number' } }
+const validation = v.create({
+    number: v.required().min(4).max(30)
+})
 ```
 
 **Multi rules**

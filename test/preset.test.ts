@@ -32,11 +32,12 @@ test('preset min', () => {
 
 test('preset require min', () => {
     const v = preset({
+        required: (expect) => expect(`required`, c => c['$0']),
         min: (expect, n) => expect(`>${n}`, c => c['$0'] > n),
-        required: (expect) => expect(`required`, c => c['$0'])
+        max: (expect, n) => expect(`<${n}`, c => c['$0'] < n),
     })
     const validation = v.create({
-        a: v.required().min(4)
+        a: v.required().min(4).max(7)
     })
 
     let r
@@ -47,6 +48,10 @@ test('preset require min', () => {
     r = validation.test({ a: 3 })
     expect(r.pass).toEqual(false)
     expect(r.messages.a).toEqual('>4')
+
+    r = validation.test({ a: 8 })
+    expect(r.pass).toEqual(false)
+    expect(r.messages.a).toEqual('<7')
 })
 
 test('preset require min expect', () => {
