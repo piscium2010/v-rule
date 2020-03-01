@@ -42,6 +42,61 @@ const validation = v.create({
 ## Usage
 
 **Basic**
+<div>
+    <img width="600px" src="https://github.com/piscium2010/piscium2010.github.io/raw/master/v-rule/images/a.png">
+</div>
+
+```jsx
+import v from 'v-rule'
+
+const validation = v.create({
+    seat: v.expect('This is required', c => c['seat'] !== '') // alternative v.expect('This is required')
+})
+const result = validation.test({ seat: '' })
+// => { pass: false, messages: { seat: 'This is required' } }
+```
+<div>
+    <img width="600px" src="https://github.com/piscium2010/piscium2010.github.io/raw/master/v-rule/images/b.png">
+</div>
+
+```jsx
+import v from 'v-rule'
+
+const validation = v.create({
+    seat: v.expect('This is required', c => c['seat'] !== ''),
+    age: v.when('drink', c => c['drink'] === 'budweiser').expect('Required when drink beer')
+})
+const result = validation.test({ seat: '6', drink: 'budweiser', age: '' })
+// => { pass: false, messages: { age: 'Required when drink beer' } }
+```
+<div>
+    <img width="600px" src="https://github.com/piscium2010/piscium2010.github.io/raw/master/v-rule/images/c.png">
+</div>
+
+```jsx
+import v from 'v-rule'
+
+const validation = v.create({
+    seat: v.expect('This is required', c => c['seat'] !== ''),
+    age: v.when('drink', c => c['drink'] === 'budweiser').expect('Required when drink beer').expect('You should be an adult', c => c['age'] > 17)
+})
+const result = validation.test({ seat: '6', drink: 'budweiser', age: 16 })
+// => { pass: false, messages: { age: 'You should be an adult' } }
+```
+<div>
+    <img width="600px" src="https://github.com/piscium2010/piscium2010.github.io/raw/master/v-rule/images/d.png">
+</div>
+
+```jsx
+import v from 'v-rule'
+
+const validation = v.create({
+    seat: v.expect('This is required', c => c['seat'] !== ''),
+    age: v.when('drink', c => c['drink'] === 'budweiser').expect('Required when drink beer').expect('You should be an adult', c => c['age'] > 17)
+})
+const result = validation.test({ seat: '6', drink: 'budweiser', age: 18 })
+// => { pass: trues, messages: {} }
+```
 
 ```jsx
 import v from 'v-rule'
