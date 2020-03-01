@@ -20,8 +20,9 @@ Light and flexible validatin rules for form
 npm i -S v-rule
 ```
 
-## Example
+## Example - Order a beer in restaurant
 
+### 1
 <div>
     <img width="600px" src="https://github.com/piscium2010/piscium2010.github.io/raw/master/v-rule/images/a.png">
 </div>
@@ -35,6 +36,8 @@ const validation = v.create({
 const result = validation.test({ seat: '' })
 // => { pass: false, messages: { seat: 'This is required' } }
 ```
+
+### 2
 <div>
     <img width="600px" src="https://github.com/piscium2010/piscium2010.github.io/raw/master/v-rule/images/b.png">
 </div>
@@ -49,6 +52,8 @@ const validation = v.create({
 const result = validation.test({ seat: '6', drink: 'budweiser', age: '' })
 // => { pass: false, messages: { age: 'Required when drink beer' } }
 ```
+
+### 3
 <div>
     <img width="600px" src="https://github.com/piscium2010/piscium2010.github.io/raw/master/v-rule/images/c.png">
 </div>
@@ -63,6 +68,8 @@ const validation = v.create({
 const result = validation.test({ seat: '6', drink: 'budweiser', age: 16 })
 // => { pass: false, messages: { age: 'You should be an adult' } }
 ```
+
+### 4
 <div>
     <img width="600px" src="https://github.com/piscium2010/piscium2010.github.io/raw/master/v-rule/images/d.png">
 </div>
