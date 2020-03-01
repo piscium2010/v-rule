@@ -101,7 +101,7 @@ import { preset } from 'v-rule'
 const v = preset({
     required: (expect) => expect(`required`),
     min: (expect, n) => expect(`> ${n}`, c => c['$0'] > n),
-    max: (expect, m) => expect(`> ${m}`, c => c['$0'] < m),
+    max: (expect, m) => expect(`< ${m}`, c => c['$0'] < m),
 })
 const validation = v.create({
     number: v.required().min(4).max(30)
