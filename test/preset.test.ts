@@ -48,3 +48,18 @@ test('preset require min', () => {
     expect(r.pass).toEqual(false)
     expect(r.messages.a).toEqual('>4')
 })
+
+test('preset require min expect', () => {
+    const v = preset({
+        min: (expect, n) => expect(`>${n}`, c => c['$0'] > n),
+        required: (expect) => expect(`required`, c => c['$0'])
+    })
+    const validation = v.create({
+        a: v.required().min(4).expect('<15', c => c['a'] < 15)
+    })
+
+    let r
+    r = validation.test({ a: 17 })
+    expect(r.pass).toEqual(false)
+    expect(r.messages.a).toEqual('<15')
+})

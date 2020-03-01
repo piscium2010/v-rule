@@ -38,8 +38,8 @@ function whenNot(prerequisite, relativeKeys, preset, key, assert?) {
 
 function expect(prerequisite, relativeKeys, preset, desc, assert?) {
     if (typeof desc !== 'string' || desc === '') { throw new Error(ERROR_2) }
-    let rule
-    rule = function (instance, primaryKey) {
+    const funcs = {}
+    const rule = function (instance, primaryKey) {
         const pre = prerequisite(instance, primaryKey)
         const next = 'triggered' in pre ? pre['triggered'] : pre.pass
         if (next) {
@@ -57,13 +57,9 @@ function expect(prerequisite, relativeKeys, preset, desc, assert?) {
             : { triggered: false, pass: true, messages: { [primaryKey]: '' } } // validation not triggered
     }
 
-    const _expect = expect.bind(null, rule, relativeKeys, preset)
-    const funcs = {}
-    Object.keys(preset).forEach(k => {
-        funcs[k] = preset[k].bind(null, _expect)
-    })
-    rule.expect = _expect
-    Object.assign(rule, { expect: _expect }, funcs)
+    rule.expect = expect.bind(null, rule, relativeKeys, preset)
+    Object.keys(preset).forEach(k => funcs[k] = preset[k].bind(null, rule.expect))
+    Object.assign(rule, funcs)
     return rule
 }
 
@@ -80,15 +76,16 @@ function validate(prerequisite, key) {
     }
 }
 
-function preset<T>(preset = noPreset) {
-    const _expect = expect.bind(null, noPrerequisite, emptyKeys, preset)
-    const funcs = {}
-    Object.keys(preset).forEach(k => {
-        funcs[k] = preset[k].bind(null, _expect)
-    })
-    return {
+type ExpectChain = (...arg: any[]) => { expect: ExpectChain }
+type Preset<T> = {
+    [prop in keyof T]: (...args: any[]) => Preset<T> & { expect: ExpectChain }
+}
+
+function preset<T>(preset = noPreset as T) {
+    const funcs = {} as Preset<T>
+    const v = {
         create: ruleStore => new Validation(ruleStore),
-        expect: _expect,
+        expect: expect.bind(null, noPrerequisite, emptyKeys, preset),
         when: when.bind(null, noPrerequisite, emptyKeys, preset),
         whenNot: whenNot.bind(null, noPrerequisite, emptyKeys, preset),
         validate: validate.bind(null, noPrerequisite),
@@ -98,9 +95,10 @@ function preset<T>(preset = noPreset) {
         isNumber,
         isDate,
         isEmail,
-        isUrl,
-        ...funcs
-    } as any
+        isUrl
+    }
+    Object.keys(preset).forEach(k => funcs[k] = preset[k].bind(null, v.expect))
+    return Object.assign(v, funcs)
 }
 
 export { preset }

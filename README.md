@@ -39,8 +39,6 @@ const validation = v.create({
 })
 ```
 
-[source code of above demo](https://github.com/piscium2010/v-form/blob/master/README.md#ant-design)
-
 ## Usage
 
 **Basic**
